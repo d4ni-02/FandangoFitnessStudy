@@ -37,7 +37,7 @@ class Fitness(abc.ABC):
     def __repr__(self) -> str:
         return f"Fitness(success={self.success})"
 
-
+# used only is the goal is to optimize, not to solve constraints.
 class ValueFitness(Fitness):
     """
     Class to represent the fitness of a tree based on calculated values.
@@ -66,7 +66,8 @@ class ValueFitness(Fitness):
         """
         if self.values:
             try:
-                return sum(self.values) / len(self.values)
+                print("PROVA PRINT")
+                return sum(self.values) / len(self.values)      # ALTERNATIVE that calculates
             except OverflowError:
                 # OverflowError: integer division result too large for a float
                 return sum(self.values) // len(self.values)
@@ -80,6 +81,7 @@ class ValueFitness(Fitness):
         return f"ValueFitness(values={self.values})"
 
 
+# used only when the fuzzer knows if a constraint is satisfied or not
 class ConstraintFitness(Fitness):
     """
     Class to represent the fitness of a tree based on constraints.
@@ -115,7 +117,8 @@ class ConstraintFitness(Fitness):
         :return float: The fitness of the tree.
         """
         if self.total:
-            return self.solved / self.total
+            print("PROVA PRINT2")
+            return self.solved / self.total      # RATIO: solved constraints / total
         else:
             return 0
 
@@ -131,7 +134,7 @@ class ConstraintFitness(Fitness):
     def __repr__(self) -> str:
         return f"ConstraintFitness(solved={self.solved}, total={self.total}, success={self.success})"
 
-
+# used when can compute how far the solution is from the correct constraint satisfaction 
 class DistanceAwareConstraintFitness(ConstraintFitness):
     """
     Class to represent the fitness of a tree based on distance-aware constraints.
@@ -152,16 +155,18 @@ class DistanceAwareConstraintFitness(ConstraintFitness):
             suggestion=suggestion,
             failing_trees=failing_trees,
         )
-        self.values = values
+        self.values = values        # values is a list representing the partial satisfaction of each constraint
+                                    # solved is BOOLEAN 0 or 1
 
     def fitness(self) -> float:
         """
         Calculates the fitness of the tree based on the values.
         This is the same as `ValueFitness`.
         """
-        if self.values:
+        if self.values: 
             try:
-                return sum(self.values) / len(self.values)
+                print("PROVA PRINT3")
+                return sum(self.values) / len(self.values)  # since W_c are equal the paper formula becomes an avg sum / total
             except OverflowError:
                 # OverflowError: integer division result too large for a float
                 return sum(self.values) // len(self.values)
