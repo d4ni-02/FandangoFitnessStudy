@@ -456,6 +456,14 @@ class SimpleGeneticAlgorithm(GeneticAlgorithm):
                     self.evaluation, key=lambda x: x[1], reverse=True
                 )[: self.population_size]
 
+
+            LOGGER.info(f"--- Generation Fitness; Gen: {generation} ---")
+            for idx, item in enumerate(self.evaluation):
+                tree = item[0]
+                fitness_val = item[1]
+                #
+                LOGGER.info(f"Ind #{idx + 1} | Fitness: {fitness_val:.4f} | Tree: {tree}")  
+
             current_best_fitness = max(e[1] for e in self.evaluation)
             current_max_repetitions = self.grammar.get_max_repetition()
             self.adaptive_tuner.update_parameters(

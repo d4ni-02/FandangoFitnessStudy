@@ -66,8 +66,8 @@ class ValueFitness(Fitness):
         """
         if self.values:
             try:
-                print("PROVA PRINT")
-                return sum(self.values) / len(self.values)      # ALTERNATIVE that calculates
+                print("Computed: ValueFitness")
+                return sum(self.values) / len(self.values)
             except OverflowError:
                 # OverflowError: integer division result too large for a float
                 return sum(self.values) // len(self.values)
@@ -81,7 +81,6 @@ class ValueFitness(Fitness):
         return f"ValueFitness(values={self.values})"
 
 
-# used only when the fuzzer knows if a constraint is satisfied or not
 class ConstraintFitness(Fitness):
     """
     Class to represent the fitness of a tree based on constraints.
@@ -91,10 +90,15 @@ class ConstraintFitness(Fitness):
 
     def __init__(
         self,
+        # total SOLVED constraints
         solved: int,
+        # total constraints for that tree
         total: int,
+        # indicate if the tree satisfies all constraints => fitness success
         success: bool,
+        # possibile suggestions for tree
         suggestion: Suggestion,
+        # list of trees that failed constraints satisfation
         failing_trees: Optional[list[FailingTree]] = None,
     ):
         """
@@ -117,10 +121,18 @@ class ConstraintFitness(Fitness):
         :return float: The fitness of the tree.
         """
         if self.total:
-            print("PROVA PRINT2")
-            return self.solved / self.total      # RATIO: solved constraints / total
+            # print("\n Computed: ConstrintFitness")
+            # print(f'Solved: {self.solved}; Total: {self.total}')
+            # print(f'Fitness: {self.solved / self.total}')
+            # return self.solved / self.total
+            
+            
+            # TEST ONE: Boolean Fitness Only
+            #   Fitness on the tree doesn't tell how far the tree is from the constraint satisfaction.
+            #   Expected behavior: convergence speed decreases
+            return 1.0 if self.solved == self.total else 0.0
         else:
-            return 0
+            return 1.0 if self.solved == self.total else 0.0
 
     def __copy__(self) -> Fitness:
         return ConstraintFitness(
@@ -143,6 +155,8 @@ class DistanceAwareConstraintFitness(ConstraintFitness):
 
     def __init__(
         self,
+        # each element represents a satisfation grade on a constraint
+        # Value next to 1 is close to full satisfaction
         values: list[float],
         suggestion: Suggestion,
         success: bool = True,
@@ -165,11 +179,21 @@ class DistanceAwareConstraintFitness(ConstraintFitness):
         """
         if self.values: 
             try:
-                print("PROVA PRINT3")
-                return sum(self.values) / len(self.values)  # since W_c are equal the paper formula becomes an avg sum / total
+                # print("\n Computed: DistanceAwareConstraintFitness")
+                # print(f'Values: {self.values};')
+                # print(f'Fitness: {sum(self.values) / len(self.values)}')
+                # return sum(self.values) / len(self.values)  # since W_c are equal the paper formula becomes an avg sum / total
+                
+                # TEST ONE: Boolean Fitness Only
+                #   Fitness on the tree doesn't tell how far the tree is from the constraint satisfaction.
+                #   Expected behavior: convergence speed decreases
+                return 1.0 if self.solved == self.total else 0.0
             except OverflowError:
                 # OverflowError: integer division result too large for a float
-                return sum(self.values) // len(self.values)
+                # return sum(self.values) // len(self.values)
+
+                # TEST 1
+                return 1.0 if self.solved == self.total else 0.0
         else:
             return 0
 
