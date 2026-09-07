@@ -11,7 +11,9 @@ class Fitness(abc.ABC):
     """
 
     def __init__(
-        self, success: bool, failing_trees: Optional[list[FailingTree]] = None
+        self, success: bool, 
+        # list of trees that caused fail
+        failing_trees: Optional[list[FailingTree]] = None
     ):
         """
         Initialize the Fitness with the given success and failing trees.
@@ -66,6 +68,7 @@ class ValueFitness(Fitness):
         """
         if self.values:
             try:
+                # NOTE: is the AVG
                 return sum(self.values) / len(self.values)
             except OverflowError:
                 # OverflowError: integer division result too large for a float
@@ -104,6 +107,7 @@ class ConstraintFitness(Fitness):
         :param Optional[Suggestion] suggestion: The suggestion to fix the failing trees.
         """
         super().__init__(success, failing_trees)
+        # Suggestion for tree correction
         self.suggestion = suggestion
         self.solved = solved
         self.total = total
@@ -115,6 +119,7 @@ class ConstraintFitness(Fitness):
         :return float: The fitness of the tree.
         """
         if self.total:
+            # Number of solved constraints over total
             return self.solved / self.total
         else:
             return 0
@@ -146,6 +151,7 @@ class DistanceAwareConstraintFitness(ConstraintFitness):
         failing_trees: Optional[list[FailingTree]] = None,
     ):
         super().__init__(
+            # NOTE: ONLY SOLVED constraints
             solved=sum(1 for it in values if it == 1.0),
             total=len(values),
             success=success,
@@ -161,6 +167,7 @@ class DistanceAwareConstraintFitness(ConstraintFitness):
         """
         if self.values:
             try:
+                # NOT SOLVED/TOTAL, but AVG of values 
                 return sum(self.values) / len(self.values)
             except OverflowError:
                 # OverflowError: integer division result too large for a float
