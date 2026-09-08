@@ -55,6 +55,7 @@ class SimpleGeneticAlgorithm(GeneticAlgorithm):
         start_symbol: str = "<start>",
         diversity_k: int = 5,
         diversity_weight: float = 1.0,
+        # diversity_weight: float = 0.0,
         max_repetition_rate: float = 0.5,
         max_repetitions: Optional[int] = None,
         max_nodes: int = 200,
@@ -462,7 +463,7 @@ class SimpleGeneticAlgorithm(GeneticAlgorithm):
                 tree = item[0]
                 fitness_val = item[1]
                 #
-                LOGGER.info(f"Ind #{idx + 1} | Fitness: {fitness_val:.4f} | Tree: {tree}")  
+                LOGGER.info(f"Ind #{idx + 1} | Fitness: {fitness_val:.4f} | Tree: {tree} ")  
 
             current_best_fitness = max(e[1] for e in self.evaluation)
             current_max_repetitions = self.grammar.get_max_repetition()
