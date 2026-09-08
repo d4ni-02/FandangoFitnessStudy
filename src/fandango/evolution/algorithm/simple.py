@@ -34,6 +34,16 @@ from fandango.logger import (
 )
 
 
+
+
+# ABLATION STUDY
+import csv
+import statistics
+from pathlib import Path
+
+
+
+
 class SimpleGeneticAlgorithm(GeneticAlgorithm):
     def __init__(
         self,
@@ -67,6 +77,9 @@ class SimpleGeneticAlgorithm(GeneticAlgorithm):
         use_fcc: bool = False,
         put: Optional[str] = None,
         put_args: Optional[list[str]] = None,
+
+        # CSV PATH for saving ablation study results
+        csv_path: Optional[str] = None,
     ):
         if tournament_size > 1:
             raise FandangoValueError(
@@ -134,6 +147,79 @@ class SimpleGeneticAlgorithm(GeneticAlgorithm):
         self.fixes_made = 0
         self.mutations_made = 0
         self.time_taken = 0.0
+
+
+    # ---------- ABLATION STUDY CSV SAVE ------------------
+        self.ablation_csv_path = csv_path
+        if self.ablation_csv_path:
+            self._init_ablation_csv()
+    
+    def _init_ablation_csv(self) -> None:
+        """Initialize CSV"""
+        fieldnames = [
+            "generation",
+            "gen_fitness_vals",
+            "best_fitness",
+            "mean_fitness",
+            "std_fitness",
+            "median_fitness",
+            "valid_solutions_count",
+            "fixes_made_so_far",
+            "mutations_made_so_far",
+            "crossovers_made_so_far",
+        ]
+        csv_path = Path(self.ablation_csv_path)
+        if csv_path.parent:
+            csv_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(csv_path, mode="w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+
+
+        # Ablation Study Save metrics
+        # Computes and write metrics of current generation on CSV file
+    def _collect_ablation_metrics(self, generation: int) -> None:
+        if not self.evaluation or not self.ablation_csv_path:
+            return
+
+        fitness_list = [e[1] for e in self.evaluation]
+        # trees = [e[0] for e in self.evaluation]
+
+        best_fit = max(fitness_list)
+        mean_fit = statistics.mean(fitness_list)
+        std_fit = statistics.stdev(fitness_list) if len(fitness_list) > 1 else 0.0
+        median_fit = statistics.median(fitness_list)
+        valid_solutions_count = sum(
+            1 for fit in fitness_list if fit >= self.evaluator.expected_fitness
+        )
+
+        # sizes = [t.size() for t in trees]
+        # avg_tree_size = statistics.mean(sizes) if sizes else 0.0
+
+        row_data = {
+            "generation": generation,
+            "gen_fitness_vals" : fitness_list,
+            "best_fitness": round(best_fit, 6),
+            "mean_fitness": round(mean_fit, 6),
+            "std_fitness": round(std_fit, 6),
+            "median_fitness": round(median_fit, 6),
+            "valid_solutions_count": valid_solutions_count,
+            # "avg_tree_size": round(avg_tree_size, 2),
+            "fixes_made_so_far": self.fixes_made,
+            "mutations_made_so_far": self.mutations_made,
+            "crossovers_made_so_far": self.crossovers_made,
+        }
+
+        with open(self.ablation_csv_path, mode="a", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=list(row_data.keys()))
+            writer.writerow(row_data)
+
+
+    ######################################################################
+
+
+
 
     def _parse_and_deduplicate(
         self, population: Optional[list[DerivationTree | str]]
@@ -457,13 +543,26 @@ class SimpleGeneticAlgorithm(GeneticAlgorithm):
                     self.evaluation, key=lambda x: x[1], reverse=True
                 )[: self.population_size]
 
+
+
+            # ------------ ABLATION STUDY -----------
+            print(self.ablation_csv_path)
+            if self.ablation_csv_path:
+                self._collect_ablation_metrics(generation)
+
+
             # Print Fitness value for corresponding tree
-            LOGGER.info(f"--- Generation Fitness; Gen: {generation} ---")
-            for idx, item in enumerate(self.evaluation):
-                tree = item[0]
-                fitness_val = item[1]
-                #
-                LOGGER.info(f"Ind #{idx + 1} | Fitness: {fitness_val:.4f} | Tree: {tree} ")  
+            # LOGGER.info(f"--- Generation Fitness; Gen: {generation} ---")
+            # for idx, item in enumerate(self.evaluation):
+            #     tree = item[0]
+            #     fitness_val = item[1]
+            #     #
+            #     LOGGER.info(f"Ind #{idx + 1} | Fitness: {fitness_val:.4f} | Tree: {tree} ")
+
+
+
+
+
 
             current_best_fitness = max(e[1] for e in self.evaluation)
             current_max_repetitions = self.grammar.get_max_repetition()

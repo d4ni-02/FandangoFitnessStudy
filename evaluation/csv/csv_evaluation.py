@@ -1,6 +1,7 @@
 import csv
 import time
 from io import StringIO
+from typing import Optional
 
 from fandango.evolution.algorithm import LoggerLevel, SimpleGeneticAlgorithm
 from fandango.language.parse.parse import parse
@@ -26,18 +27,23 @@ def is_syntactically_valid_csv(csv_string):
 
 def evaluate_csv(
     seconds=60,
+    # Ablation Study Eval
+    ablation_csv_path: Optional[str] = None,
 ) -> tuple[str, int, int, float, tuple[float, int, int], float, float]:
     with open("evaluation/csv/csv.fan", "r") as file:
         grammar, constraints = parse(file, use_stdlib=False)
         assert grammar is not None
 
     solutions = []
-
     time_in_an_hour = time.time() + seconds
 
     fandango = SimpleGeneticAlgorithm(
-        grammar, constraints, logger_level=LoggerLevel.ERROR
+        grammar,
+        constraints,
+        logger_level=LoggerLevel.ERROR,
+        csv_path=ablation_csv_path,  # PATH
     )
+    
     fan_gen = fandango.generate()
     for solution in fan_gen:
         solutions.append(solution)
@@ -51,9 +57,12 @@ def evaluate_csv(
         if is_syntactically_valid_csv(str(solution)):
             valid.append(solution)
 
-    set_mean_length = sum(len(str(x)) for x in valid) / len(valid)
-    set_medium_length = sorted(len(str(x)) for x in valid)[len(valid) // 2]
-    valid_percentage = len(valid) / len(solutions) * 100
+    set_mean_length = sum(len(str(x)) for x in valid) / len(valid) if valid else 0
+    set_medium_length = (
+        sorted(len(str(x)) for x in valid)[len(valid) // 2] if valid else 0
+    )
+    valid_percentage = (len(valid) / len(solutions) * 100) if solutions else 0.0
+
     return (
         "CSV",
         len(solutions),
@@ -63,7 +72,6 @@ def evaluate_csv(
         set_mean_length,
         set_medium_length,
     )
-
 
 if __name__ == "__main__":
     result = evaluate_csv(seconds=10)

@@ -1,0 +1,2 @@
+timestamp,subject,run_time_seconds,total_inputs,valid_solutions,valid_percentage,grammar_coverage_score,covered_rules,total_rules,mean_length,median_length
+2026-09-08 21:16:32,TAR,60,64,64,100.0,0.2661,542,2037,2048.0,2048
