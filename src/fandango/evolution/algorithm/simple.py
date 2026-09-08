@@ -456,7 +456,7 @@ class SimpleGeneticAlgorithm(GeneticAlgorithm):
                     self.evaluation, key=lambda x: x[1], reverse=True
                 )[: self.population_size]
 
-
+            # Print Fitness value for corresponding tree
             LOGGER.info(f"--- Generation Fitness; Gen: {generation} ---")
             for idx, item in enumerate(self.evaluation):
                 tree = item[0]
