@@ -35,13 +35,10 @@ from fandango.logger import (
 
 
 
-
 # ABLATION STUDY
 import csv
 import statistics
 from pathlib import Path
-
-
 
 
 class SimpleGeneticAlgorithm(GeneticAlgorithm):
@@ -65,7 +62,6 @@ class SimpleGeneticAlgorithm(GeneticAlgorithm):
         start_symbol: str = "<start>",
         diversity_k: int = 5,
         diversity_weight: float = 1.0,
-        # diversity_weight: float = 0.0,
         max_repetition_rate: float = 0.5,
         max_repetitions: Optional[int] = None,
         max_nodes: int = 200,
@@ -149,7 +145,9 @@ class SimpleGeneticAlgorithm(GeneticAlgorithm):
         self.time_taken = 0.0
 
 
-    # ---------- ABLATION STUDY CSV SAVE ------------------
+
+
+ # ---------- ABLATION STUDY CSV SAVE ------------------
         self.ablation_csv_path = csv_path
         if self.ablation_csv_path:
             self._init_ablation_csv()
@@ -176,6 +174,7 @@ class SimpleGeneticAlgorithm(GeneticAlgorithm):
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
 
+        print(self.ablation_csv_path)
 
         # Ablation Study Save metrics
         # Computes and write metrics of current generation on CSV file
@@ -546,20 +545,9 @@ class SimpleGeneticAlgorithm(GeneticAlgorithm):
 
 
             # ------------ ABLATION STUDY -----------
-            print(self.ablation_csv_path)
+            # print(self.ablation_csv_path)
             if self.ablation_csv_path:
                 self._collect_ablation_metrics(generation)
-
-
-            # Print Fitness value for corresponding tree
-            # LOGGER.info(f"--- Generation Fitness; Gen: {generation} ---")
-            # for idx, item in enumerate(self.evaluation):
-            #     tree = item[0]
-            #     fitness_val = item[1]
-            #     #
-            #     LOGGER.info(f"Ind #{idx + 1} | Fitness: {fitness_val:.4f} | Tree: {tree} ")
-
-
 
 
 
