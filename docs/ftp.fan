@@ -1,1 +1,0 @@
-../evaluation/protocol_testing_eval/ftp/ftp.fan
