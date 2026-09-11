@@ -1,0 +1,10 @@
+*
+!src/
+!src/fandango/
+!src/fandango/evolution/
+!src/fandango/evolution/algorithm/
+!src/fandango/evolution/algorithm/simple.py
+!src/fandango/constraints/
+!src/fandango/constraints/fitness.py
+!evaluation/
+!evaluation/*.py
