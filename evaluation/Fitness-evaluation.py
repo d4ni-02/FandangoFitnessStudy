@@ -41,7 +41,6 @@ def save_summary_result_to_csv(output_file: str, seconds: int, result: tuple):
         "median_length": round(median_len, 2),
     }
 
-    # Verifica se il file esiste già per scrivere l'intestazione solo la prima volta
     file_exists = False
     try:
         with open(output_file, mode="r", encoding="utf-8") as f:
@@ -74,9 +73,8 @@ def better_print_results(
 
 
 def _execute_evaluation_process(eval_func, seconds, ablation_csv_path, queue):
-    """Esegue l'eval_func in un processo separato per isolare completamente memoria e cache."""
+    """Isolate evaluations to avoid cached results"""
     try:
-        # Opzionalmente pulisce la cache anche all'avvio del processo figlio
         clear_cache()
         res = eval_func(seconds=seconds, ablation_csv_path=ablation_csv_path)
         queue.put(("SUCCESS", res))
@@ -107,15 +105,15 @@ def run_evaluation(time_limit: Optional[str] = "3600", num_runs: int = 10):
         print(f"STARTING RUN {run_id} / {num_runs}")
         print(f"{'='*40}")
 
-        # File di summary specifico per questa run
+        # Summary file
         summary_csv_file = f"../csv-tests/evaluation_summary_results_run{run_id}.csv"
         
         for name, eval_func in evaluations:
-            # File di ablation specifico per questo test e per questa run
+            # ablation results file
             ablation_log_path = f"../csv-tests/ablation_generations_{name.lower()}_{seconds}s_run{run_id}.csv"
             
             try:
-                print(f"--> Esecuzione di {name} (Run {run_id}) in un processo dedicato...")
+                print(f"--> Executing {name} (Run {run_id}) on dedicated process...")
                 
                 queue = multiprocessing.Queue()
                 p = multiprocessing.Process(
@@ -139,7 +137,6 @@ def run_evaluation(time_limit: Optional[str] = "3600", num_runs: int = 10):
 
 
 if __name__ == "__main__":
-    # Necessario su alcuni sistemi operativi (es. Windows) per il corretto funzionamento del multiprocessing
     multiprocessing.freeze_support()
     arg = sys.argv[1] if len(sys.argv) > 1 else None
     run_evaluation(arg)

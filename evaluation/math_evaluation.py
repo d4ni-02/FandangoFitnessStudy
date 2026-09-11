@@ -8,31 +8,21 @@ from fandango.language.parse.parse import parse
 
 
 def is_syntactically_valid_math(math_string: str) -> bool:
-    """
-    Verifica che la stringa generata rispetti sia la grammatica che i vincoli
-    definiti nel file .fan:
-    1. L'espressione matematica valutata deve essere 42
-    2. Tutti i numeri generati devono essere pari
-    """
     try:
         s = math_string.strip()
         if not s:
             return False
 
-        # Constraint 2: Tutti i valori generati sono pari
         # where forall <n> in <number>: int(str(<n>)) % 2 == 0
         numbers = re.findall(r'\d+', s)
         for num_str in numbers:
             if int(num_str) % 2 != 0:
                 return False
 
-        # Constraint 1: Il valore totale è 42
         # where eval(str(<start>)) == 42
-        # Usiamo eval in modo controllato (la stringa è generata da una grammatica safe)
         if eval(s) != 42:
             return False
 
-        # Constraint 3: lunghezza minima dell'espressione
         # where len(str(<start>)) >= 5
         if len(s) < 5:
             return False
@@ -49,8 +39,7 @@ def evaluate_math(
     # Ablation study
     ablation_csv_path: Optional[str] = None,
 ) -> tuple[str, int, int, float, tuple[float, int, int], float, float]:
-    
-    # Assicurati che il file contenga la grammatica fornita
+
     with open("../eval-tests/test-math.fan", "r") as file:
         grammar, constraints = parse(file, use_stdlib=False)
         assert grammar is not None

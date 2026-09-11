@@ -7,13 +7,13 @@ from fandango.language.parse.parse import parse
 
 
 def is_valid_word(word: str) -> bool:
-    """Verifica che la parola rispetti la grammatica: <uppercase> <lowercase>+"""
+    """verify: <uppercase> <lowercase>+"""
     if not word or len(word) < 2:
         return False
     return word[0].isupper() and all(c.islower() for c in word[1:])
 
 def is_valid_age(age_str: str) -> bool:
-    """Verifica che l'età sia composta esclusivamente da cifre numeriche."""
+    """Verify age is numeric"""
     return bool(age_str) and age_str.isdigit()
 
 def is_syntactically_valid_person(person_string: str) -> bool:
@@ -36,7 +36,7 @@ def is_syntactically_valid_person(person_string: str) -> bool:
 
         first_name, last_name = name_tokens
 
-        # Controllo della struttura di <word> senza regex
+        # <word> structure
         if not is_valid_word(first_name):
             print(person_string)
             return False
@@ -44,24 +44,24 @@ def is_syntactically_valid_person(person_string: str) -> bool:
             print(person_string)
             return False
 
-        # Controllo della struttura di <age> senza regex
+        # <age> structure
         if not is_valid_age(age_str):
             print(person_string)
             return False
 
         age = int(age_str)
 
-        # Vincolo 2: 21 <= età <= 100
+        # 21 <= età <= 100
         if not (21 <= age <= 100):
             print(person_string)
             return False
 
-        # Vincolo 3: età divisibile per 7
+        # mod 7
         if age % 7 != 0:
             print(person_string)
             return False
 
-        # Vincolo 1: ogni nome inizia con 'A'
+        # names start with "A"
         if not first_name.startswith("A"):
             print(person_string)
             return False
@@ -69,7 +69,7 @@ def is_syntactically_valid_person(person_string: str) -> bool:
             print(person_string)
             return False
 
-        # Vincolo 4: lunghezza di ogni nome tra 8 e 20
+        # name length check
         if not (8 <= len(first_name) <= 20):
             print(person_string)
             return False
