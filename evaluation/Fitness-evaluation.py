@@ -106,11 +106,11 @@ def run_evaluation(time_limit: Optional[str] = "3600", num_runs: int = 10):
         print(f"{'='*40}")
 
         # Summary file
-        summary_csv_file = f"../csv-tests/evaluation_summary_results_run{run_id}.csv"
+        summary_csv_file = f"../csv-tests-Linear/evaluation_summary_results_run{run_id}.csv"
         
         for name, eval_func in evaluations:
             # ablation results file
-            ablation_log_path = f"../csv-tests/ablation_generations_{name.lower()}_{seconds}s_run{run_id}.csv"
+            ablation_log_path = f"../csv-tests-Linear/ablation_generations_{name.lower()}_{seconds}s_run{run_id}.csv"
             
             try:
                 print(f"--> Executing {name} (Run {run_id}) on dedicated process...")
