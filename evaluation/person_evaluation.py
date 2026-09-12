@@ -7,13 +7,11 @@ from fandango.language.parse.parse import parse
 
 
 def is_valid_word(word: str) -> bool:
-    """verify: <uppercase> <lowercase>+"""
     if not word or len(word) < 2:
         return False
     return word[0].isupper() and all(c.islower() for c in word[1:])
 
 def is_valid_age(age_str: str) -> bool:
-    """Verify age is numeric"""
     return bool(age_str) and age_str.isdigit()
 
 def is_syntactically_valid_person(person_string: str) -> bool:
@@ -23,7 +21,6 @@ def is_syntactically_valid_person(person_string: str) -> bool:
         # <person_record> ::= <name> "," <age>
         parts = s.split(",", 1)
         if len(parts) != 2:
-            print(person_string)
             return False
 
         name_part, age_str = parts[0].strip(), parts[1].strip()
@@ -31,56 +28,41 @@ def is_syntactically_valid_person(person_string: str) -> bool:
         # <name> ::= <first_name> " " <last_name>
         name_tokens = name_part.split(" ", 1)
         if len(name_tokens) != 2:
-            print(person_string)
             return False
 
         first_name, last_name = name_tokens
 
-        # <word> structure
         if not is_valid_word(first_name):
-            print(person_string)
             return False
         if not is_valid_word(last_name):
-            print(person_string)
             return False
 
-        # <age> structure
         if not is_valid_age(age_str):
-            print(person_string)
             return False
 
         age = int(age_str)
 
-        # 21 <= età <= 100
+        # Vincolo 2: 21 <= età <= 100
         if not (21 <= age <= 100):
-            print(person_string)
             return False
 
-        # mod 7
         if age % 7 != 0:
-            print(person_string)
             return False
 
-        # names start with "A"
+
         if not first_name.startswith("A"):
-            print(person_string)
             return False
         if not last_name.startswith("A"):
-            print(person_string)
             return False
 
-        # name length check
         if not (8 <= len(first_name) <= 20):
-            print(person_string)
             return False
         if not (8 <= len(last_name) <= 20):
-            print(person_string)
             return False
 
         return True
 
     except Exception:
-        print("OPS", person_string)
         return False
 
 def evaluate_person(
@@ -115,7 +97,6 @@ def evaluate_person(
         if is_syntactically_valid_person(str(solution)):
             valid.append(solution)
 
-    # Gestione sicura del calcolo della lunghezza in caso di 0 soluzioni valide
     if valid:
         set_mean_length = sum(len(str(x)) for x in valid) / len(valid)
         set_medium_length = sorted(len(str(x)) for x in valid)[len(valid) // 2]
