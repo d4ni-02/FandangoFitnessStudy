@@ -96,8 +96,8 @@ def run_evaluation(time_limit: Optional[str] = "3600", num_runs: int = 10):
     random.seed(random_seed)
 
     evaluations = [
-        ("Person", evaluate_person),
-        ("Math", evaluate_math),
+        # ("Person", evaluate_person),
+        # ("Math", evaluate_math),
         ("Byte", evaluate_byte),
     ]
 
@@ -107,11 +107,11 @@ def run_evaluation(time_limit: Optional[str] = "3600", num_runs: int = 10):
         print(f"{'='*40}")
 
         # File di summary specifico per questa run
-        summary_csv_file = f"../csv-tests/evaluation_summary_results_run{run_id}.csv"
+        summary_csv_file = f"../csv-tests-test/evaluation_summary_results_run{run_id}.csv"
         
         for name, eval_func in evaluations:
             # File di ablation specifico per questo test e per questa run
-            ablation_log_path = f"../csv-tests/ablation_generations_{name.lower()}_{seconds}s_run{run_id}.csv"
+            ablation_log_path = f"../csv-tests-test/ablation_generations_{name.lower()}_{seconds}s_run{run_id}.csv"
             
             try:
                 print(f"--> Executing {name} (Run {run_id}) on dedicated process...")

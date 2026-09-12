@@ -5,49 +5,73 @@ from fandango.evolution.algorithm import LoggerLevel, SimpleGeneticAlgorithm
 from fandango.language.parse.parse import parse
 
 
+
+
+
 def is_syntactically_valid_byte(bit_string: str) -> bool:
+    """
+    Verifica se una stringa soddisfa i vincoli della grammatica specificata:
 
+        where 100 <= int(str(<magic_byte1>), 2) + int(str(<magic_byte2>), 2) <= 300
+        where int(str(<magic_byte1>), 2) % 4 == 0
+        where int(str(<magic_byte2>), 2) % 5 == 0
+        where forall <b> in <payload>.<byte>: str(<b>) != "00000000"
+        where forall <b> in <payload>.<byte>: str(<b>).count("0") >= 2
+        where len(str(<payload>)) % 256 == int(str(<length>), 2) * 8
+    """
     try:
-        s = bit_string.strip()
-
-
-        if not s or len(s) % 8 != 0:
-            return False
-        if any(c not in "01" for c in s):
+        if not isinstance(bit_string, str):
             return False
 
-        # Min length
-        if len(s) < 24:
+        # Sintassi: solo '0' e '1', nessuna spaziatura
+        if not bit_string or any(c not in "01" for c in bit_string):
             return False
 
-        # <magic> (16 bit) | <length> (8 bit) | <payload> (8*n bit)
-        magic = s[0:16]
-        length_byte = s[16:24]
-        payload = s[24:]
-
-
-        # where str(<magic>).startswith("11001")
-        if not magic.startswith("11001010"):
+        # Layout: <magic_byte1>(8) <magic_byte2>(8) <length>(8) <payload>(8*N, N >= 1)
+        # Lunghezza minima = 32 bit (4 byte)
+        if len(bit_string) < 32 or len(bit_string) % 8 != 0:
             return False
 
+        magic_byte1 = bit_string[0:8]
+        magic_byte2 = bit_string[8:16]
+        length_byte = bit_string[16:24]
+        payload = bit_string[24:]
 
-        if len(payload) % 8 != 0:
+        if len(payload) % 8 != 0 or len(payload) == 0:
             return False
 
+        mb1_val = int(magic_byte1, 2)
+        mb2_val = int(magic_byte2, 2)
+
+        # Vincolo 1: 100 <= magic_byte1 + magic_byte2 <= 300
+        if not (100 <= mb1_val + mb2_val <= 300):
+            return False
+
+        # Vincolo 2: magic_byte1 % 4 == 0
+        if mb1_val % 4 != 0:
+            return False
+
+        # Vincolo 3: magic_byte2 % 5 == 0
+        if mb2_val % 5 != 0:
+            return False
+
+        # Vincolo 4: Vincoli sui byte del payload
         payload_bytes = [payload[i:i + 8] for i in range(0, len(payload), 8)]
+        for b in payload_bytes:
+            if b == "00000000":
+                return False
+            if b.count("0") < 2:
+                return False
 
-        # where exists <b> in <payload>.<byte>: str(<b>).count("1") == 7
-        if not any(b.count("1") == 7 for b in payload_bytes):
-            return False
-
-        # where forall <b> in <payload>.<byte>: str(<b>).count("1") % 2 == 1
-        if not all(b.count("1") % 2 == 1 for b in payload_bytes):
+        # Vincolo 5: len(payload) % 256 == int(length) * 8
+        if len(payload) % 256 != int(length_byte, 2) * 8:
             return False
 
         return True
 
     except Exception:
         return False
+
 
 
 def evaluate_byte(
