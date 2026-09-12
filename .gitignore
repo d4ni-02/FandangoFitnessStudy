@@ -12,3 +12,4 @@
 !evaluation/
 !evaluation/*.py
 !src/fandango/constraints/fitness.py
+!/src/fandango/evolution/evaluation.py
