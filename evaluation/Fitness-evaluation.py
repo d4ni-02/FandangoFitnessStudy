@@ -72,10 +72,11 @@ def better_print_results(
     print("")
 
 
-def _execute_evaluation_process(eval_func, seconds, ablation_csv_path, queue):
+def _execute_evaluation_process(eval_func, seconds, ablation_csv_path, queue, seed):
     """Isolate evaluations to avoid cached results"""
     try:
         clear_cache()
+        random.seed(seed)
         res = eval_func(seconds=seconds, ablation_csv_path=ablation_csv_path)
         queue.put(("SUCCESS", res))
     except Exception as e:
@@ -84,7 +85,7 @@ def _execute_evaluation_process(eval_func, seconds, ablation_csv_path, queue):
 
 def run_evaluation(time_limit: Optional[str] = "3600", num_runs: int = 10):
     seconds = 3600
-    random_seed = 1
+    # random_seed = 1
 
     if time_limit is not None:
         seconds = int(time_limit)
@@ -92,7 +93,7 @@ def run_evaluation(time_limit: Optional[str] = "3600", num_runs: int = 10):
     else:
         print("Running evaluation with default settings (1 hour).")
 
-    random.seed(random_seed)
+    # random.seed(random_seed)
 
     evaluations = [
         ("Person", evaluate_person),
@@ -100,6 +101,7 @@ def run_evaluation(time_limit: Optional[str] = "3600", num_runs: int = 10):
         ("Byte", evaluate_byte),
     ]
 
+    base_seed = 42
     for run_id in range(1, num_runs + 1):
         print(f"\n{'='*40}")
         print(f"STARTING RUN {run_id} / {num_runs}")
@@ -107,6 +109,8 @@ def run_evaluation(time_limit: Optional[str] = "3600", num_runs: int = 10):
 
         # Summary file
         summary_csv_file = f"../csv-tests-Linear/evaluation_summary_results_run{run_id}.csv"
+
+        run_seed = base_seed + run_id
         
         for name, eval_func in evaluations:
             # ablation results file
@@ -118,7 +122,7 @@ def run_evaluation(time_limit: Optional[str] = "3600", num_runs: int = 10):
                 queue = multiprocessing.Queue()
                 p = multiprocessing.Process(
                     target=_execute_evaluation_process,
-                    args=(eval_func, seconds, ablation_log_path, queue)
+                    args=(eval_func, seconds, ablation_log_path, queue, run_seed)
                 )
                 p.start()
                 

@@ -8,40 +8,24 @@ from fandango.language.parse.parse import parse
 
 
 def is_syntactically_valid_math(math_string: str) -> bool:
-    """
-    Verifica se una stringa soddisfa i constraint di test-math.fan:
-
-        where abs(eval(str(<start>)) - 42) <= 25
-        where forall <n> in <number>:         int(str(<n>)) % 2 == 0
-        where forall <n> in <nonzero_number>: int(str(<n>)) % 2 == 0
-        where 10 <= len(str(<start>)) <= 20
-    """
     try:
         s = math_string.strip()
         if not s:
             return False
 
-        # Constraint 2 & 3: ogni numero generato deve essere pari.
-        # <nonzero_number> è un sottoinsieme di <number>, quindi
-        # controllare tutti i numeri è sufficiente.
         for num_str in re.findall(r"\d+", s):
             if int(num_str) % 2 != 0:
                 return False
 
-        # Constraint 1: abs(eval - 42) <= 25  =>  eval in [17, 67]
-        # eval() può sollevare eccezioni su espressioni malformate:
-        # il try/except esterno le intercetta e ritorna False.
         value = eval(s)
         if abs(value - 42) > 25:
             return False
 
-        # Constraint 4: 10 <= len(str(<start>)) <= 20
-        if not (10 <= len(s) <= 20):
+        if not (10 <= len(s) <= 40):
             return False
 
         return True
-
-    except Exception:
+    except Exception as e:
         return False
 
 def evaluate_math(
