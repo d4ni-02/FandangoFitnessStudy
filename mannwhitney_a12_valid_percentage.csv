@@ -1,0 +1,10 @@
+alpha,subject,p_value,A12,direction
+alpha015,BYTE,0.27303633975118835,0.65,alpha>linear
+alpha05,BYTE,0.18587673236587576,0.68,alpha>linear
+alpha2,BYTE,0.4273553138978077,0.61,alpha>linear
+alpha015,Math,0.3846730627355087,0.38,alpha<linear
+alpha05,Math,0.21229383619233155,0.67,alpha>linear
+alpha2,Math,0.6775849579524755,0.56,alpha>linear
+alpha015,PERSON,0.5707503880581739,0.58,alpha>linear
+alpha05,PERSON,0.7913367801006604,0.46,alpha<linear
+alpha2,PERSON,0.5205228832757727,0.59,alpha>linear
