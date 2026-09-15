@@ -23,16 +23,12 @@ def load_summaries(directory):
     """Carica e concatena tutti gli evaluation_summary_results_run*.csv di una dir."""
     files = sorted(glob.glob(os.path.join(directory, "evaluation_summary_results_run*.csv")))
     if not files:
-        raise FileNotFoundError(f"Nessun summary trovato in {directory}")
+        raise FileNotFoundError(f"No summary foind in {directory}")
     return pd.concat([pd.read_csv(f) for f in files], ignore_index=True)
 
 
 def vargha_delaney_a12(x, y):
-    """
-    A12 = P(X > Y) + 0.5 * P(X == Y), stimato sulle osservazioni.
-    A12 > 0.5 -> X tende a essere maggiore di Y
-    A12 = 0.5 -> nessuna differenza stocastica
-    """
+
     x = np.asarray(x, dtype=float)
     y = np.asarray(y, dtype=float)
     if len(x) == 0 or len(y) == 0:
