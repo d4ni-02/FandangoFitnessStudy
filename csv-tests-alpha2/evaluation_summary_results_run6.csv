@@ -1,0 +1,4 @@
+timestamp,subject,run_time_seconds,total_inputs,valid_solutions,valid_percentage,grammar_coverage_score,covered_rules,total_rules,mean_length,median_length
+2026-09-13 19:58:01,PERSON,600,1639,55,3.36,0.8617,299,347,36.18,36
+2026-09-13 20:08:06,Math,600,3827,837,21.87,0.3633,109,300,28.91,31
+2026-09-13 20:20:14,BYTE,600,3343,2907,86.96,0.4375,21,48,80.0,80
