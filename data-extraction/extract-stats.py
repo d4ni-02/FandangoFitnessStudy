@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 from scipy import stats
 
 def compute_ci95(series: pd.Series) -> float:
-    """Calcola l'intervallo di confidenza al 95% per una serie di dati."""
     n = len(series.dropna())
     if n < 2:
         return 0.0
@@ -16,17 +15,15 @@ def compute_ci95(series: pd.Series) -> float:
     return sem * stats.t.ppf((1 + 0.95) / 2., n - 1)
 
 def process_summaries(input_dir: str) -> pd.DataFrame:
-    """Aggrega i file di summary (evaluation_summary_results_run*.csv)."""
     pattern = os.path.join(input_dir, "evaluation_summary_results_run*.csv")
     files = glob.glob(pattern)
     
     if not files:
-        print(f"[!] Nessun file summary trovato in: {input_dir}")
+        print(f"No summary found: {input_dir}")
         return pd.DataFrame()
 
     df_list = []
     for f in files:
-        # Estrai il numero di run dal nome del file
         match = re.search(r'run(\d+)\.csv$', f)
         run_id = int(match.group(1)) if match else None
         
@@ -36,36 +33,31 @@ def process_summaries(input_dir: str) -> pd.DataFrame:
 
     combined_df = pd.concat(df_list, ignore_index=True)
 
-    # Metriche di summary rilevanti da aggregare per ciascun soggetto
     metrics = [
         'valid_percentage', 'grammar_coverage_score', 'covered_rules', 
         'valid_solutions', 'total_inputs', 'mean_length', 'median_length'
     ]
     
-    # Aggregazione: calcolo di Media, Std Dev e 95% CI
     agg_funcs = {}
     for m in metrics:
         if m in combined_df.columns:
             agg_funcs[m] = ['mean', 'std', compute_ci95]
 
     summary_stats = combined_df.groupby('subject').agg(agg_funcs)
-    # Appiattisci le colonne multilivello (es. valid_percentage_mean)
     summary_stats.columns = ['_'.join(col).strip() for col in summary_stats.columns.values]
     return summary_stats.reset_index()
 
 def process_generations(input_dir: str) -> pd.DataFrame:
-    """Aggrega i file generational (ablation_generations_{subject}_600s_run*.csv)."""
     pattern = os.path.join(input_dir, "ablation_generations_*_run*.csv")
     files = glob.glob(pattern)
 
     if not files:
-        print(f"[!] Nessun file generational trovato in: {input_dir}")
+        print(f"File not found: {input_dir}")
         return pd.DataFrame()
 
     df_list = []
     for f in files:
         filename = os.path.basename(f)
-        # Estrazione di soggetto e run dal nome del file
         match = re.search(r'ablation_generations_(.+)_600s_run(\d+)\.csv$', filename)
         if match:
             subject = match.group(1)
@@ -80,7 +72,6 @@ def process_generations(input_dir: str) -> pd.DataFrame:
 
     combined_df = pd.concat(df_list, ignore_index=True)
 
-    # Metriche per generazione da aggregare (inclusi valid_solutions_count e fitness per retrocompatibilità)
     gen_metrics = ['valid_solutions_count', 'mean_fitness', 'best_fitness']
     
     agg_funcs = {}
@@ -93,7 +84,6 @@ def process_generations(input_dir: str) -> pd.DataFrame:
     return gen_stats.reset_index()
 
 def plot_combined_fitness(fit_curve: pd.DataFrame, output_path: str) -> None:
-    """Genera il grafico della fitness originale (mantenuto per comparazione interna)."""
     subjects = sorted(fit_curve["subject"].unique())
     colors = plt.cm.tab10(np.linspace(0, 1, len(subjects)))
 
@@ -128,7 +118,6 @@ def plot_combined_fitness(fit_curve: pd.DataFrame, output_path: str) -> None:
     plt.close(fig)
 
 def plot_valid_solutions_convergence(gen_curve: pd.DataFrame, output_path: str) -> None:
-    """Grafico della velocità di convergenza basato sul numero di soluzioni valide accumulate."""
     subjects = sorted(gen_curve["subject"].unique())
     colors = plt.cm.tab10(np.linspace(0, 1, len(subjects)))
 
@@ -168,32 +157,31 @@ def main():
 
     print(f"[*] Analisi file in corso da: {args.input_dir}")
     
-    # 1. Processa Summary complessivi
+    # process simmaries
     summary_df = process_summaries(args.input_dir)
     if not summary_df.empty:
         summary_csv_path = os.path.join(args.output_dir, "aggregated_summary_metrics.csv")
         summary_df.to_csv(summary_csv_path, index=False)
         print(f"[+] Metriche di Summary salvate in: {summary_csv_path}")
 
-    # 2. Processa Generazioni nel tempo
+    # process generations
     generations_df = process_generations(args.input_dir)
     if not generations_df.empty:
         generations_csv_path = os.path.join(args.output_dir, "aggregated_generation_metrics.csv")
         generations_df.to_csv(generations_csv_path, index=False)
         print(f"[+] Metriche Generazionali salvate in: {generations_csv_path}")
 
-        # 3. Generazione dei Grafici
+        # Plot gen
         fitness_plot_path = os.path.join(args.output_dir, "combined_fitness.png")
-        # Rinominiamo temporaneamente la colonna per farla coincidere con il tuo plot originale
         fit_curve = generations_df.rename(columns={"best_fitness_compute_ci95": "best_fitness_ci95"})
         plot_combined_fitness(fit_curve, fitness_plot_path)
         print(f"[+] Grafico Fitness salvato in: {fitness_plot_path}")
 
         valid_plot_path = os.path.join(args.output_dir, "valid_solutions_convergence.png")
         plot_valid_solutions_convergence(generations_df, valid_plot_path)
-        print(f"[+] Grafico Soluzioni Valide salvato in: {valid_plot_path}")
+        print(f"Plot with solutions saved in: {valid_plot_path}")
 
-    print("[✔] Elaborazione completata con successo!")
+    print("OK")
 
 if __name__ == "__main__":
     main()

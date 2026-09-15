@@ -36,8 +36,9 @@ class Evaluator:
 
         # TEST Fitness alpha value for non-linearity
         # Fitness alpha = 1 same as paper fitness computation
-        # Fitness alpha = 0.5 avg fitness should be higher
-        # Fitness alpha = 2.0 avg fitness is lower
+        # Fitness alpha = 0.5
+        # Fitness alpha = 2.0
+        # fitness alpha = 0.15
         fitness_alpha : float = 1.0,
     ):
         self._grammar = grammar

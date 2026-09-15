@@ -5,24 +5,6 @@ import pandas as pd
 from scipy.stats import rankdata
 
 
-
-def interpret_a12(a12):
-    """Restituisce l'interpretazione qualitativa dell'effetto A12."""
-    if np.isnan(a12):
-        return "N/A"
-    d = abs(a12 - 0.5)
-    if d < 0.06:  # < 0.56
-        effect = "Trascurabile"
-    elif d < 0.14:  # < 0.64
-        effect = "Piccolo"
-    elif d < 0.21:  # < 0.71
-        effect = "Medio"
-    else:  # >= 0.71
-        effect = "Grande"
-
-    direction = "Migliore" if a12 > 0.5 else ("Peggiore" if a12 < 0.5 else "Uguale")
-    return f"{effect} ({direction})"
-
 def vargha_delaney_a12(treatment, baseline):
     m, n = len(treatment), len(baseline)
     if m == 0 or n == 0:
@@ -83,7 +65,6 @@ for subj in subjects:
             "Mean (Alpha)": round(np.mean(treat_vals), 2) if treat_vals else 0,
             "Mean (Linear)": round(np.mean(base_vals), 2) if base_vals else 0,
             "A12 Score": round(a12_score, 4),
-            "Effetto A12": interpret_a12(a12_score),
         })
 
 # Stampa i risultati
