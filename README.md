@@ -3,6 +3,10 @@
 - For the FANDANGO's implementation files, only the modified files are here reported.
 - Missing files for the FANDANGO implementation are unchanged from the original version (https://github.com/fandango-fuzzer/fandango.git)
 
+# About the tests
+The directory eval-tests contains some of the custom grammar defined in testing FANDANGO.
+Only the files test-person, test-math, test-byte are used in the study
+
 # Commands
 ## Execute the tests
 - each time the $\alpha$ value was manually changed (/fandango/src/fandango/evolution/evaluation.py)

@@ -9,14 +9,10 @@
 <age> ::= <digit>+
 <digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 
-# 1. Tutti i nomi iniziano con 'A'
 where forall <w> in <word>: str(<w>).startswith("A")
 
-# 2. Età compresa tra 21 e 100
 where 21 <= int(str(<age>)) and int(str(<age>)) <= 100
 
-# 3. Età divisibile per 7
 where int(str(<age>)) % 7 == 0
 
-# 4. Lunghezza di ogni nome tra 8 e 12
 where forall <w> in <word>: 8 <= len(str(<w>)) <= 20
