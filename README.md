@@ -5,7 +5,7 @@
 
 # Commands
 ## Execute the tests
-- each time the $\alpha$ value was manually changed
+- each time the $\alpha$ value was manually changed (/fandango/src/fandango/evolution/evaluation.py)
 - each file the output directory in Fitness-evaluation.py was manually changed
 ```bash
 Path: fandango/evaluation
